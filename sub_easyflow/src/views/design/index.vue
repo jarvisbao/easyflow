@@ -180,7 +180,7 @@ export default {
   methods: {
     createNewDiagram() {
       let bpmnXmlStr = ''
-      if (JSON.stringify(this.flow_info.def_setting) !== '{}') {
+      if (this.flow_info.def_setting) {
         bpmnXmlStr = this.flow_info.def_setting
       } else {
         bpmnXmlStr = `
