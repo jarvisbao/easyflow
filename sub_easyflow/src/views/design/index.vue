@@ -31,7 +31,7 @@
       </div>
     </div>
     <div ref="bpmnContainer" :style="{height: height + 'px'}" class="bpmn-container">
-      <div id="canvas" ref="canvas" />
+      <div id="canvas" ref="canvas" style="height: 100%;" />
       <panel
         v-if="bpmnModeler"
         :modeler="bpmnModeler"
@@ -93,7 +93,8 @@ export default {
       loading: false,
       loadingNew: false,
       flowDefaultBtns: [],
-      nodeDefaultBtns: []
+      nodeDefaultBtns: [],
+      bpmnNodeId: null
     }
   },
   computed: {
@@ -426,6 +427,7 @@ export default {
       if (flowElements && flowElements.length > 0) {
         const validate = []
         let message = null
+        const canvas = this.bpmnModeler.get('canvas')
         flowElements.forEach(item => {
           if (item.$type === 'bpmn:StartEvent' && !item.eventDefinitions) {
             const noneEvent = getExtension(item, 'enfo:NoneEventDefinition')
@@ -434,8 +436,20 @@ export default {
               message = '请完成开始节点人员配置'
             }
           }
+          if (item.$type !== 'bpmn:SequenceFlow') {
+            if (!item.name) {
+              this.bpmnNodeId = item.id
+              validate.push(false)
+              if (item.$type.indexOf('Gateway') !== -1) {
+                message = '网关名称不能为空！'
+              } else {
+                message = '请输入节点名称'
+              }
+            }
+          }
           if (item.$type === 'bpmn:UserTask') {
             if (!getExtension(item, 'enfo:Assigns')) {
+              this.bpmnNodeId = item.id
               validate.push(false)
               message = '请完成人工任务节点人员配置'
             }
@@ -443,11 +457,13 @@ export default {
           if (hasEventDefinition(item, 'bpmn:MessageEventDefinition')) {
             if (item.$type === 'bpmn:IntermediateThrowEvent') {
               if (!item.eventDefinitions[0].messageRef || !item.eventDefinitions[0].$attrs.producer) {
+                this.bpmnNodeId = item.id
                 validate.push(false)
                 message = '请完成消息事件的节点相关配置'
               }
             } else {
               if (!item.eventDefinitions[0].messageRef || !item.eventDefinitions[0].$attrs.consumer) {
+                this.bpmnNodeId = item.id
                 validate.push(false)
                 message = '请完成消息事件的节点相关配置'
               }
@@ -456,11 +472,13 @@ export default {
           if (hasEventDefinition(item, 'bpmn:SignalEventDefinition')) {
             if (item.$type === 'bpmn:IntermediateThrowEvent') {
               if (!item.eventDefinitions[0].signalRef || !item.eventDefinitions[0].$attrs.producer) {
+                this.bpmnNodeId = item.id
                 validate.push(false)
                 message = '请完成信号事件的节点相关配置'
               }
             } else {
               if (!item.eventDefinitions[0].signalRef || !item.eventDefinitions[0].$attrs.consumer) {
+                this.bpmnNodeId = item.id
                 validate.push(false)
                 message = '请完成信号事件的节点相关配置'
               }
@@ -478,7 +496,10 @@ export default {
           })
         } else if (validate.includes(false)) {
           this.$alert(message, '提示', {
-            confirmButtonText: '确定'
+            confirmButtonText: '确定',
+            callback: action => {
+              canvas.addMarker(this.bpmnNodeId, 'highError')
+            }
           })
         } else {
           this.act_def_id = allNode.id
@@ -573,3 +594,23 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+/deep/ .highError.djs-shape .djs-visual > :nth-child(1) {
+  stroke: rgb(207, 40, 40) !important;
+  fill-opacity: 0.2 !important;
+}
+/deep/ .highError.djs-shape .djs-visual > :nth-child(2) {
+  fill: rgb(207, 40, 40) !important;
+}
+/deep/ .highError.djs-shape .djs-visual > path {
+  fill: rgb(207, 40, 40) !important;
+  fill-opacity: 0.2 !important;
+  // stroke: rgb(207, 40, 40) !important;
+}
+/deep/ .highError.djs-connection > .djs-visual > path {
+  stroke: rgb(207, 40, 40) !important;
+}
+/deep/ .highError .icon-huiqianrenwu {
+  color: rgb(207, 40, 40) !important;
+}
+</style>

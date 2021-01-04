@@ -154,8 +154,8 @@
           <!-- 脚本任务 -->
           <el-collapse-item v-if="nodeType === 'bpmn:ScriptTask'" name="script">
             <template slot="title">
-                脚本配置
-              </template>
+              脚本配置
+            </template>
             <el-form-item label="服务">
               <el-input v-model="script.cls" @change="handleScript" />
             </el-form-item>
@@ -297,7 +297,8 @@ export default {
         fun: null,
         route: null
       },
-      script: this.scriptInfo
+      script: this.scriptInfo,
+      canvas: null
     }
   },
   computed: {
@@ -344,6 +345,9 @@ export default {
     this.message = this.messageInfo
     this.signal = this.signalInfo
   },
+  mounted() {
+    this.canvas = this.modeler.get('canvas')
+  },
   methods: {
     changeId(id) {
       if (id) {
@@ -358,6 +362,8 @@ export default {
       modeling.updateLabel(this.element, name)
       if (name) {
         this.$store.commit('SET_IS_SAVE', false)
+        const canvas = this.modeler.get('canvas')
+        canvas.removeMarker(this.form.id, 'highError')
       } else {
         this.$store.commit('SET_IS_SAVE', true)
       }
@@ -457,6 +463,16 @@ export default {
             this.message.consumer = []
             delete this.element.businessObject.eventDefinitions[0].$attrs.consumer
           }
+        }
+      }
+      // 去除节点标红
+      if (this.nodeType === 'signalEvent') {
+        if (this.signal.ref && this.signal.consumer.length === 2) {
+          this.canvas.removeMarker(this.element.id, 'highError')
+        }
+      } else {
+        if (this.message.ref && this.message.consumer.length === 2) {
+          this.canvas.removeMarker(this.element.id, 'highError')
         }
       }
     },
