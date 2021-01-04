@@ -584,7 +584,7 @@ export default {
           this.calledActivity.binding = element.businessObject.$attrs.calledElementBinding || null
           this.calledActivity.version = element.businessObject.$attrs.calledElementVersion || null
         }
-        //脚本任务
+        // 脚本任务
         const scriptElement = getExtension(element.businessObject, 'enfo:PythonApi')
         if (scriptElement) {
           this.scriptInfo.cls = scriptElement.cls
@@ -723,6 +723,10 @@ export default {
                 }
               })
             })
+          }
+          console.log('remove', element)
+          if (element.businessObject.name === '') {
+            this.$store.commit('SET_IS_SAVE', false)
           }
         }
       })

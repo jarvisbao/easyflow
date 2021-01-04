@@ -93,7 +93,8 @@ export default {
       showForm: false,
       showOrg: false,
       route_list: [],
-      countersign: {}
+      countersign: {},
+      canvas: null
     }
   },
   computed: {
@@ -145,6 +146,7 @@ export default {
     } else {
       this.route_list = this.routeList
     }
+    this.canvas = this.modeler.get('canvas')
   },
   methods: {
     fetchData() {
@@ -221,6 +223,10 @@ export default {
         })
 
         this.getNodeAssign()
+        // 去除节点标红
+        if (analysis && analysis.assign.length > 0) {
+          this.canvas.removeMarker(this.bpmnElements.id, 'highError')
+        }
       } else {
         // 多实例
         analysis = getExtension(businessObject, 'enfo:Countersign')
