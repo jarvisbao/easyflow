@@ -7,10 +7,10 @@
             节点
           </template>
           <div>
-            <el-form-item :rules="{required: true, message: '节点id不能为空', trigger: 'blur'}" label="ID" prop="id">
+            <el-form-item required :show-message="false" label="ID" prop="id">
               <el-input v-model="form.id" @change="changeId" />
             </el-form-item>
-            <el-form-item :rules="{required: true, message: '节点名称不能为空', trigger: 'blur'}" label="名称" prop="name">
+            <el-form-item required :show-message="false" label="名称" prop="name">
               <el-input id="node-name" v-model="form.name" @input="changeName" />
             </el-form-item>
             <el-form-item label="描述">
@@ -350,28 +350,11 @@ export default {
   },
   methods: {
     changeId(id) {
-      if (id) {
-        this.updateProperties({ id: id })
-        this.$store.commit('SET_IS_SAVE', false)
-      } else {
-        this.$store.commit('SET_IS_SAVE', true)
-      }
+      this.modeler.get('modeling').updateProperties(this.element, { id: id ? id : ' ' })
     },
     changeName(name) {
       const modeling = this.modeler.get('modeling')
       modeling.updateLabel(this.element, name)
-      if (name) {
-        this.$store.commit('SET_IS_SAVE', false)
-        const canvas = this.modeler.get('canvas')
-        canvas.removeMarker(this.form.id, 'highError')
-      } else {
-        this.$store.commit('SET_IS_SAVE', true)
-      }
-    },
-    // 在这里我们封装一个通用的更新节点属性的方法
-    updateProperties(properties) {
-      const modeling = this.modeler.get('modeling')
-      modeling.updateProperties(this.element, properties)
     },
     get_json_var(event) {
       if (event && event !== '{}') {
@@ -422,59 +405,53 @@ export default {
         })
         this.$nextTick(() => {
           delete this.element.businessObject.eventDefinitions[0].messageRef
+          const eventDefinitions = this.element.businessObject.get('eventDefinitions')
+          this.modeler.get('modeling').updateProperties(this.element, {eventDefinitions: eventDefinitions})
         })
       }
     },
     handlePayload() {
+      let eventDefinitions = this.element.businessObject.get('eventDefinitions')
       if (this.isThrowEvent) {
+        delete eventDefinitions[0].$attrs.consumer
         if (this.nodeType === 'signalEvent') {
           if (this.signal.cls && this.signal.fun) {
             this.signal.producer = [this.signal.cls, this.signal.fun]
-            this.element.businessObject.eventDefinitions[0].$attrs.producer = this.signal.producer.join('.')
+            eventDefinitions[0].$attrs.producer = this.signal.producer.join('.')
           } else {
             this.signal.producer = []
-            delete this.element.businessObject.eventDefinitions[0].$attrs.producer
+            delete eventDefinitions[0].$attrs.producer
           }
         } else {
           if (this.message.cls && this.message.fun) {
             this.message.producer = [this.message.cls, this.message.fun]
-            this.element.businessObject.eventDefinitions[0].$attrs.producer = this.message.producer.join('.')
+            eventDefinitions[0].$attrs.producer = this.message.producer.join('.')
           } else {
             this.message.producer = []
-            delete this.element.businessObject.eventDefinitions[0].$attrs.producer
+            delete eventDefinitions[0].$attrs.producer
           }
         }
-        // this.element.businessObject.eventDefinitions[0].$attrs.producer = val.length > 0 ? val.join('.') : undefined
       } else {
-        // this.element.businessObject.eventDefinitions[0].$attrs.consumer = val.length > 0 ? val.join('.') : undefined
+        delete eventDefinitions[0].$attrs.producer
         if (this.nodeType === 'signalEvent') {
           if (this.signal.cls && this.signal.fun) {
             this.signal.consumer = [this.signal.cls, this.signal.fun]
-            this.element.businessObject.eventDefinitions[0].$attrs.consumer = this.signal.consumer.join('.')
+            eventDefinitions[0].$attrs.consumer = this.signal.consumer.join('.')
           } else {
             this.signal.consumer = []
-            delete this.element.businessObject.eventDefinitions[0].$attrs.consumer
+            delete eventDefinitions[0].$attrs.consumer
           }
         } else {
           if (this.message.cls && this.message.fun) {
             this.message.consumer = [this.message.cls, this.message.fun]
-            this.element.businessObject.eventDefinitions[0].$attrs.consumer = this.message.consumer.join('.')
+            eventDefinitions[0].$attrs.consumer = this.message.consumer.join('.')
           } else {
             this.message.consumer = []
-            delete this.element.businessObject.eventDefinitions[0].$attrs.consumer
+            delete eventDefinitions[0].$attrs.consumer
           }
         }
       }
-      // 去除节点标红
-      if (this.nodeType === 'signalEvent') {
-        if (this.signal.ref && this.signal.consumer.length === 2) {
-          this.canvas.removeMarker(this.element.id, 'highError')
-        }
-      } else {
-        if (this.message.ref && this.message.consumer.length === 2) {
-          this.canvas.removeMarker(this.element.id, 'highError')
-        }
-      }
+      this.modeler.get('modeling').updateProperties(this.element, {eventDefinitions: eventDefinitions})
     },
     handleSignal(val) {
       const _signalRef = this.element.businessObject.eventDefinitions[0].signalRef
@@ -507,6 +484,8 @@ export default {
         })
         this.$nextTick(() => {
           delete this.element.businessObject.eventDefinitions[0].signalRef
+          const eventDefinitions = this.element.businessObject.get('eventDefinitions')
+          this.modeler.get('modeling').updateProperties(this.element, {eventDefinitions: eventDefinitions})
         })
       }
     },

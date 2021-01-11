@@ -95,6 +95,7 @@ export default {
     changeRemove(val) {
       const analysis = getExtension(this.bpmnElements.businessObject, 'enfo:NoneEventDefinition')
       if (analysis) {
+        const extensionElements = this.bpmnElements.businessObject.get('extensionElements')
         const values = this.bpmnElements.businessObject.extensionElements.values
         if (analysis.assigns) {
           analysis.assigns.forEach((element, index) => {
@@ -106,19 +107,11 @@ export default {
             }
           })
         }
-        // analysis.assign = analysis.assign.filter(item => {
-        //   return item.text.indexOf(val) === -1
-        // })
-        // if (analysis.assign.length < 1) {
-        //   values.forEach((item, index) => {
-        //     if (item.$type === 'enfo:Assigns') {
-        //       values.splice(index, 1)
-        //     }
-        //   })
+
+        // if (values.length < 1) {
+        //   delete this.bpmnElements.businessObject.extensionElements
         // }
-        if (values.length < 1) {
-          delete this.bpmnElements.businessObject.extensionElements
-        }
+        this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: values.length > 0 ? extensionElements : undefined})
       }
     },
     setPerson(events) {
@@ -128,12 +121,16 @@ export default {
       let assignElements = null
       // let analysis = getExtension(businessObject, 'enfo:Assigns')
       let analysis = getExtension(businessObject, 'enfo:NoneEventDefinition')
+      let extensionElements = businessObject.get('extensionElements')
 
       if (!analysis) {
         // analysis = moddle.create('enfo:Assigns')
         analysis = moddle.create('enfo:NoneEventDefinition')
-        businessObject.extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
-        businessObject.extensionElements.get('values').push(analysis)
+        // businessObject.extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
+        // businessObject.extensionElements.get('values').push(analysis)
+        extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
+        extensionElements.get('values').push(analysis)
+
       }
       analysis.assigns = analysis.assigns || [moddle.create('enfo:Assigns')]
       analysis.assigns[0].assign = analysis.assigns[0].assign || []
@@ -144,6 +141,8 @@ export default {
         assignElements = moddle.create('enfo:Assign', { text: item })
         analysis.assigns[0].assign.push(assignElements)
       })
+
+      this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: extensionElements})
     },
     changeRole(val) {
       this.changeRemove('role@')

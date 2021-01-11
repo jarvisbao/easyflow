@@ -61,6 +61,8 @@
 </template>
 <script>
 import BpmnModeler from '@/components/bpmn-js/lib/Modeler'
+import lintModule from 'bpmn-js-bpmnlint'
+import * as bpmnlintConfig from './packed-config.js'
 import panel from './propertyPanel'
 import customTranslate from './i18n/customTranslate'
 import BpmnData from './BpmnData'
@@ -161,11 +163,17 @@ export default {
     const customTranslateModule = {
       translate: ['value', customTranslate]
     }
+
     // 生成实例
     this.bpmnModeler = new BpmnModeler({
       container: canvas,
+      linting: {
+        bpmnlint: bpmnlintConfig,
+        active: 1
+      },
       additionalModules: [
-        customTranslateModule
+        customTranslateModule,
+        lintModule
       ],
       moddleExtensions: {
         enfo: enfoPackage
@@ -177,8 +185,25 @@ export default {
       // }
     })
     this.createNewDiagram()
+
+    const eventBus = ['import.done', 'element.changed'] // 监听流程xml导入完成，节点变化
+    eventBus.forEach(item => {
+      this.bpmnModeler.on(item, event => {
+        this.handlerLint()
+      })
+    })
   },
   methods: {
+    handlerLint() {
+      setTimeout(() => {
+        const classList = document.querySelector('.bjsl-button').className.split(' ')
+        if (classList.includes('bjsl-button-error')) {
+          this.$store.commit('SET_IS_SAVE', true)
+        } else {
+          this.$store.commit('SET_IS_SAVE', false)
+        }
+      }, 500)
+    },
     createNewDiagram() {
       let bpmnXmlStr = ''
       if (this.flow_info.def_setting) {
@@ -422,94 +447,8 @@ export default {
       // 获取所有节点信息
       // const elementRegistry = this.bpmnModeler.get('elementRegistry')
       const allNode = this.bpmnModeler.getDefinitions().rootElements[0]
-      const flowElements = allNode.flowElements
-      // 如果没有节点则提示先绘制流程图
-      if (flowElements && flowElements.length > 0) {
-        const validate = []
-        let message = null
-        const canvas = this.bpmnModeler.get('canvas')
-        flowElements.forEach(item => {
-          if (item.$type === 'bpmn:StartEvent' && !item.eventDefinitions) {
-            const noneEvent = getExtension(item, 'enfo:NoneEventDefinition')
-            if (!noneEvent || !noneEvent.assigns) {
-              validate.push(false)
-              message = '请完成开始节点人员配置'
-            }
-          }
-          if (item.$type !== 'bpmn:SequenceFlow') {
-            if (!item.name) {
-              this.bpmnNodeId = item.id
-              validate.push(false)
-              if (item.$type.indexOf('Gateway') !== -1) {
-                message = '网关名称不能为空！'
-              } else {
-                message = '请输入节点名称'
-              }
-            }
-          }
-          if (item.$type === 'bpmn:UserTask') {
-            if (!getExtension(item, 'enfo:Assigns')) {
-              this.bpmnNodeId = item.id
-              validate.push(false)
-              message = '请完成人工任务节点人员配置'
-            }
-          }
-          if (hasEventDefinition(item, 'bpmn:MessageEventDefinition')) {
-            if (item.$type === 'bpmn:IntermediateThrowEvent') {
-              if (!item.eventDefinitions[0].messageRef || !item.eventDefinitions[0].$attrs.producer) {
-                this.bpmnNodeId = item.id
-                validate.push(false)
-                message = '请完成消息事件的节点相关配置'
-              }
-            } else {
-              if (!item.eventDefinitions[0].messageRef || !item.eventDefinitions[0].$attrs.consumer) {
-                this.bpmnNodeId = item.id
-                validate.push(false)
-                message = '请完成消息事件的节点相关配置'
-              }
-            }
-          }
-          if (hasEventDefinition(item, 'bpmn:SignalEventDefinition')) {
-            if (item.$type === 'bpmn:IntermediateThrowEvent') {
-              if (!item.eventDefinitions[0].signalRef || !item.eventDefinitions[0].$attrs.producer) {
-                this.bpmnNodeId = item.id
-                validate.push(false)
-                message = '请完成信号事件的节点相关配置'
-              }
-            } else {
-              if (!item.eventDefinitions[0].signalRef || !item.eventDefinitions[0].$attrs.consumer) {
-                this.bpmnNodeId = item.id
-                validate.push(false)
-                message = '请完成信号事件的节点相关配置'
-              }
-            }
-          }
-        })
-
-        // 获取空开始节点事件
-        const startEvent = flowElements.filter(item => {
-          return item.$type === 'bpmn:StartEvent' && !item.eventDefinitions
-        })
-        if (startEvent.length > 1) {
-          this.$alert('流程图不允许有两个空开始节点！', '提示', {
-            confirmButtonText: '确定'
-          })
-        } else if (validate.includes(false)) {
-          this.$alert(message, '提示', {
-            confirmButtonText: '确定',
-            callback: action => {
-              canvas.addMarker(this.bpmnNodeId, 'highError')
-            }
-          })
-        } else {
-          this.act_def_id = allNode.id
-          this.dialogVisible = !this.dialogVisible
-        }
-      } else {
-        this.$alert('请绘制流程图后再保存！', '提示', {
-          confirmButtonText: '确定'
-        })
-      }
+      this.act_def_id = allNode.id
+      this.dialogVisible = !this.dialogVisible
     },
     publish() {
       // 修改根节点名称
@@ -595,22 +534,19 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/ .highError.djs-shape .djs-visual > :nth-child(1) {
-  stroke: rgb(207, 40, 40) !important;
-  fill-opacity: 0.2 !important;
-}
-/deep/ .highError.djs-shape .djs-visual > :nth-child(2) {
-  fill: rgb(207, 40, 40) !important;
-}
-/deep/ .highError.djs-shape .djs-visual > path {
-  fill: rgb(207, 40, 40) !important;
-  fill-opacity: 0.2 !important;
-  // stroke: rgb(207, 40, 40) !important;
-}
-/deep/ .highError.djs-connection > .djs-visual > path {
-  stroke: rgb(207, 40, 40) !important;
-}
-/deep/ .highError .icon-huiqianrenwu {
-  color: rgb(207, 40, 40) !important;
+/deep/ .bjsl-button {
+  width: auto !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  background: #fafafa !important;
+  &.bjsl-button-success {
+    background: #52b415 !important;
+  }
+  &.bjsl-button-error {
+    background: #cc3300 !important;
+  }
+  &.bjsl-button-warning {
+    background: #f7c71a !important;
+  }
 }
 </style>

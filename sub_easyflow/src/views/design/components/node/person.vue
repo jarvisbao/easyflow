@@ -176,6 +176,7 @@ export default {
       }
 
       if (analysis) {
+        const extensionElements = this.bpmnElements.businessObject.get('extensionElements')
         const values = this.bpmnElements.businessObject.extensionElements.values
         if (!this.isCountersign) {
           analysis.assign = analysis.assign.filter(item => {
@@ -197,9 +198,10 @@ export default {
             })
           }
         }
-        if (values.length < 1) {
-          delete this.bpmnElements.businessObject.extensionElements
-        }
+        // if (values.length < 1) {
+        //   delete this.bpmnElements.businessObject.extensionElements
+        // }
+        this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: values.length > 0 ? extensionElements : undefined})
       }
     },
     setPerson(events) {
@@ -207,13 +209,16 @@ export default {
       const businessObject = this.bpmnElements.businessObject
       let assignElements = null
       let analysis = null
+      let extensionElements = businessObject.get('extensionElements')
 
       if (!this.isCountersign) {
         analysis = getExtension(businessObject, 'enfo:Assigns')
         if (!analysis) {
           analysis = moddle.create('enfo:Assigns')
-          businessObject.extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
-          businessObject.extensionElements.get('values').push(analysis)
+          // businessObject.extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
+          // businessObject.extensionElements.get('values').push(analysis)
+          extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
+          extensionElements.get('values').push(analysis)
         }
 
         analysis.assign = analysis.assign || []
@@ -221,12 +226,9 @@ export default {
           assignElements = moddle.create('enfo:Assign', { text: item.code, name: item.text })
           analysis.assign.push(assignElements)
         })
+        this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: extensionElements})
 
         this.getNodeAssign()
-        // 去除节点标红
-        if (analysis && analysis.assign.length > 0) {
-          this.canvas.removeMarker(this.bpmnElements.id, 'highError')
-        }
       } else {
         // 多实例
         analysis = getExtension(businessObject, 'enfo:Countersign')

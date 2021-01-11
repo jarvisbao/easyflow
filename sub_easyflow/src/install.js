@@ -20,6 +20,7 @@ import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
+import 'bpmn-js-bpmnlint/dist/assets/css/bpmn-js-bpmnlint.css'
 
 // 注册公共组件
 import '@/components/moduleForm/install'

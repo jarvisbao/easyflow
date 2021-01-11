@@ -82,6 +82,7 @@ export default {
       element: {},
       form: {},
       nodeType: '',
+      elementType: '',
       isConditional: false,
       isMultiInstance: false,
       multiInstance_type: 'none',
@@ -139,6 +140,7 @@ export default {
         // console.log('$$', element)
 
         this.nodeType = element.type
+        this.elementType = element.type
         // 判断是否是空开始节点
         if (this.nodeType === 'bpmn:StartEvent' && !element.businessObject.eventDefinitions) {
           this.nodeType = 'EmptyStartEvent'
@@ -691,7 +693,7 @@ export default {
       this.modeler.on('shape.changed', e => {
         const { element } = e
         const type = element.type
-        if (this.nodeType === 'EmptyStartEvent' && type === 'bpmn:StartEvent') return
+        if ((this.nodeType === 'EmptyStartEvent' && type === 'bpmn:StartEvent') || this.elementType === type) return
         if (this.nodeType !== type && element.businessObject.extensionElements && type !== 'label' && type !== 'bpmn:StartEvent') {
           delete element.businessObject.extensionElements
         }
@@ -723,10 +725,6 @@ export default {
                 }
               })
             })
-          }
-          console.log('remove', element)
-          if (element.businessObject.name === '') {
-            this.$store.commit('SET_IS_SAVE', false)
           }
         }
       })
