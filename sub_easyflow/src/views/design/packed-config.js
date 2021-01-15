@@ -719,21 +719,20 @@ var nodeExtension = function() {
       }
     }
     if (is$c(node, 'bpmn:UserTask')) {
-      if (!getExtension(node, 'enfo:Assigns')) {
+      const assignsExtension = getExtension(node, 'enfo:Assigns')
+      if (!assignsExtension || !assignsExtension.assign) {
         reporter.report(node.id, `请完成"${node.name}"节点人员配置`);
       }
     }
 
     if (is$c(node, 'bpmn:StartEvent') || is$c(node, 'bpmn:IntermediateThrowEvent') || is$c(node, 'bpmn:IntermediateCatchEvent')) {
       if (hasEventDefinition(node, 'bpmn:MessageEventDefinition')) {
-        console.log('1111', node)
         if (node.$type === 'bpmn:IntermediateThrowEvent') {
           if (!node.eventDefinitions[0].messageRef || !node.eventDefinitions[0].$attrs.producer) {
             reporter.report(node.id, '请完成消息事件的节点相关配置');
           }
         } else {
           if (!node.eventDefinitions[0].messageRef || !node.eventDefinitions[0].$attrs.consumer) {
-            console.log('2222')
             reporter.report(node.id, '请完成消息事件的节点相关配置');
           }
         }

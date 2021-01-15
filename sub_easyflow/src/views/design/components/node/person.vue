@@ -179,17 +179,19 @@ export default {
         const extensionElements = this.bpmnElements.businessObject.get('extensionElements')
         const values = this.bpmnElements.businessObject.extensionElements.values
         if (!this.isCountersign) {
-          analysis.assign = analysis.assign.filter(item => {
-            return item.text.indexOf(val) === -1
-          })
-          if (analysis.assign.length < 1) {
-            values.forEach((item, index) => {
-              if (item.$type === 'enfo:Assigns') {
-                values.splice(index, 1)
-              }
+          if (analysis.assign) {
+            analysis.assign = analysis.assign.filter(item => {
+              return item.text.indexOf(val) === -1
             })
+            if (analysis.assign.length < 1) {
+              values.forEach((item, index) => {
+                if (item.$type === 'enfo:Assigns') {
+                  values.splice(index, 1)
+                }
+              })
+            }
+            this.getNodeAssign()
           }
-          this.getNodeAssign()
         } else {
           // 会签
           if (analysis.courseResultSess) {

@@ -68,11 +68,6 @@ export default {
       return this.$store.state.app.reload
     }
   },
-  created() {
-    if (self.frameElement && self.frameElement.tagName === 'IFRAME') {
-      this.inIframe = true
-    }
-  },
   watch: {
     $route: {
       handler(val) {
@@ -93,6 +88,11 @@ export default {
         }
         this.$store.commit('SET_RELOAD', '')
       }
+    }
+  },
+  created() {
+    if (self.frameElement && self.frameElement.tagName === 'IFRAME') {
+      this.inIframe = true
     }
   },
   methods: {

@@ -36,7 +36,6 @@
         v-if="bpmnModeler"
         :modeler="bpmnModeler"
         :root-elements="rootElements"
-        :flow-info="flow_info"
         :node-default-btns="nodeDefaultBtns"
         :flow-default-btns="flowDefaultBtns"
         class="panel"
@@ -146,7 +145,15 @@ export default {
     // 默认按钮
     this.$Apis.flow.buttons_default().then(response => {
       if (response.code === this.$Utils.Constlib.ERROR_CODE_OK) {
-        const items = response.payload
+        const items = response.payload.map(item => {
+          return {
+            ...item,
+            allow_cls: item.allow_script[0] || null,
+            allow_fun: item.allow_script[1] || null,
+            submit_cls: item.submit_script[0] || null,
+            submit_fun: item.submit_script[1] || null
+          }
+        })
         this.flowDefaultBtns = items.filter(item => {
           return item.belong === 'process'
         })
@@ -157,7 +164,7 @@ export default {
     })
   },
   mounted() {
-    this.$store.commit('SET_IS_SAVE', false)
+    // this.$store.commit('SET_IS_SAVE', false)
     this.height = this.$refs.canvas.clientHeight
     const canvas = this.$refs.canvas
     const customTranslateModule = {

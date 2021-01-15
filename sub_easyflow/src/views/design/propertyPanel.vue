@@ -60,10 +60,6 @@ export default {
       type: Object,
       default: () => {}
     },
-    flowInfo: {
-      type: Object,
-      default: () => {}
-    },
     objItems: {
       type: Array,
       default: () => []
