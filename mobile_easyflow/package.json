@@ -9,7 +9,7 @@
     "lint:fix": "eslint --fix --ext .js,.vue ./;exit 0"
   },
   "dependencies": {
-    "@fire-dragons/vant": "^0.2.1",
+    "@hzenfo/vant": "^0.2.2",
     "async-validator": "^3.4.0",
     "axios": "^0.19.2",
     "bpmn-js": "^6.5.1",

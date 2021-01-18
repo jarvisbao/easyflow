@@ -65,7 +65,7 @@ module.exports = {
       extensions: ['.js', '.vue', '.json'],
       alias: {
         '@': resolve('src'),
-        'vant': '@fire-dragons/vant',
+        'vant': '@hzenfo/vant',
         'vue$': 'vue/dist/vue.esm.js'
       }
     }
