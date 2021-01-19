@@ -10,22 +10,22 @@
             指定用户
           </el-radio>
         </el-radio-group>
-        <el-select id="change-user" v-if="showUser" v-model="user" multiple filterable placeholder="请选择" @change="changeUser">
+        <el-select id="change-user" v-if="showUser" v-model="user" multiple filterable placeholder="请选择" @change="handleChange(['route@', 'user@'], user)">
           <el-option v-for="(item, index) in userList" :key="index" :label="item.text" :value="item.code" />
         </el-select>
       </el-form-item>
       <el-form-item label="小组">
-        <el-select id="change-group" v-model="person.group" multiple filterable placeholder="请选择小组" @change="changeGroup" @remove-tag="remove">
+        <el-select id="change-group" v-model="person.group" multiple filterable placeholder="请选择小组" @change="handleChange('group@', person.group)">
           <el-option v-for="(item, index) in groupList" :key="index" :label="item.text" :value="item.code" />
         </el-select>
       </el-form-item>
       <el-form-item label="角色">
-        <el-select id="change-role" v-model="person.role" multiple filterable placeholder="请选择角色" @change="changeRole" @remove-tag="remove">
+        <el-select id="change-role" v-model="person.role" multiple filterable placeholder="请选择角色" @change="handleChange('role@', person.role)">
           <el-option v-for="(item, index) in roleList" :key="index" :label="item.text" :value="item.code" />
         </el-select>
       </el-form-item>
       <el-form-item label="机构">
-        <el-select id="change-role" v-model="person.organ" multiple filterable placeholder="请选择角色" @change="changeOrgan" @remove-tag="remove">
+        <el-select id="change-role" v-model="person.organ" multiple filterable placeholder="请选择角色" @change="handleChange('organ@', person.organ)">
           <el-option v-for="(item, index) in orgList" :key="index" :label="item.text" :value="item.code" />
         </el-select>
       </el-form-item>
@@ -108,9 +108,6 @@ export default {
           })
         }
 
-        // if (values.length < 1) {
-        //   delete this.bpmnElements.businessObject.extensionElements
-        // }
         this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: values.length > 0 ? extensionElements : undefined})
       }
     },
@@ -119,15 +116,11 @@ export default {
       const moddle = this.modeler.get('moddle')
       const businessObject = this.bpmnElements.businessObject
       let assignElements = null
-      // let analysis = getExtension(businessObject, 'enfo:Assigns')
       let analysis = getExtension(businessObject, 'enfo:NoneEventDefinition')
       let extensionElements = businessObject.get('extensionElements')
 
       if (!analysis) {
-        // analysis = moddle.create('enfo:Assigns')
         analysis = moddle.create('enfo:NoneEventDefinition')
-        // businessObject.extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
-        // businessObject.extensionElements.get('values').push(analysis)
         extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements')
         extensionElements.get('values').push(analysis)
 
@@ -135,8 +128,6 @@ export default {
       analysis.assigns = analysis.assigns || [moddle.create('enfo:Assigns')]
       analysis.assigns[0].assign = analysis.assigns[0].assign || []
 
-
-      // analysis.assign = analysis.assign || []
       events.forEach(item => {
         assignElements = moddle.create('enfo:Assign', { text: item })
         analysis.assigns[0].assign.push(assignElements)
@@ -144,25 +135,17 @@ export default {
 
       this.modeler.get('modeling').updateProperties(this.bpmnElements, {extensionElements: extensionElements})
     },
-    changeRole(val) {
-      this.changeRemove('role@')
-      this.setPerson(val)
-    },
-    changeGroup(val) {
-      this.changeRemove('group@')
-      this.setPerson(val)
-    },
-    changeOrgan(val) {
-      this.changeRemove('organ@')
-      this.setPerson(val)
-    },
-    remove(val) {
-      this.changeRemove(val)
-    },
-    changeUser(val) {
-      this.changeRemove('user@')
-      this.changeRemove('route@')
-      this.setPerson(val)
+    handleChange(code, val) {
+      if (Array.isArray(code)) {
+        code.forEach(item => {
+          this.changeRemove(item)
+        })
+      } else {
+        this.changeRemove(code)
+      }
+      if (val.length > 0) {
+        this.setPerson(val)
+      }
     },
     clickitem(e) {
       e === this.person.solo ? this.person.solo = '' : this.person.solo = e
@@ -174,6 +157,7 @@ export default {
         this.changeRemove('route@')
       } else if (this.person.solo === 'user@') {
         this.showUser = true
+        this.changeRemove('route@')
       } else {
         this.showUser = false
         this.user = []

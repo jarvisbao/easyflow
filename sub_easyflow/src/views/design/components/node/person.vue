@@ -27,22 +27,22 @@
         </div>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="指定用户">
-        <el-select id="change-user-code" v-model="person.user" multiple filterable value-key="code" placeholder="请选择" @change="changeUserCode">
+        <el-select id="change-user-code" v-model="person.user" multiple filterable value-key="code" placeholder="请选择" @change="handleChange('user@', person.user)">
           <el-option v-for="(item, index) in userList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="小组">
-        <el-select id="change-group" v-model="person.group" multiple filterable value-key="code" placeholder="请选择小组" @change="changeGroup" @remove-tag="remove">
+        <el-select id="change-group" v-model="person.group" multiple filterable value-key="code" placeholder="请选择小组" @change="handleChange('group@', person.group)">
           <el-option v-for="(item, index) in groupList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="角色">
-        <el-select id="change-role" v-model="person.role" multiple filterable value-key="code" placeholder="请选择角色" @change="changeRole" @remove-tag="remove">
+        <el-select id="change-role" v-model="person.role" multiple filterable value-key="code" placeholder="请选择角色" @change="handleChange('role@', person.role)">
           <el-option v-for="(item, index) in roleList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="机构">
-        <el-select id="change-org" v-model="person.organ" multiple filterable value-key="code" placeholder="请选择机构" @change="changeOrgCode" @remove-tag="remove">
+        <el-select id="change-org" v-model="person.organ" multiple filterable value-key="code" placeholder="请选择机构" @change="handleChange('organ@', person.organ)">
           <el-option v-for="(item, index) in orgList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
@@ -321,10 +321,6 @@ export default {
         this.setPerson(this.assign)
       }
     },
-    changeUserCode(val) {
-      this.changeRemove('user@')
-      this.setPerson(val)
-    },
     changeOrg(val) {
       if (!val && this.org) {
         const assign = []
@@ -434,18 +430,6 @@ export default {
         this.setPerson(this.assign)
       }
     },
-    changeRole(val) {
-      this.changeRemove('role@')
-      this.setPerson(val)
-    },
-    changeGroup(val) {
-      this.changeRemove('group@')
-      this.setPerson(val)
-    },
-    changeOrgCode(val) {
-      this.changeRemove('organ@')
-      this.setPerson(val)
-    },
     remove(val) {
       this.assign.forEach((item, index) => {
         if (item.code === val.code) {
@@ -453,6 +437,12 @@ export default {
         }
       })
       this.changeRemove(val.code)
+    },
+    handleChange(code, val) {
+      this.changeRemove(code)
+      if (val.length > 0) {
+        this.setPerson(val)
+      }
     }
   }
 }

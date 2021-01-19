@@ -253,7 +253,7 @@ export default {
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
@@ -263,7 +263,7 @@ export default {
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
@@ -273,7 +273,7 @@ export default {
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
@@ -419,12 +419,12 @@ export default {
         {
           name: 'weight',
           isAttr: true,
-          type: 'string'
+          type: 'String'
         },
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
@@ -434,7 +434,7 @@ export default {
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
@@ -444,7 +444,7 @@ export default {
         {
           name: 'text',
           isBody: true,
-          type: 'string'
+          type: 'String'
         }
       ]
     },
