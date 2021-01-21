@@ -3,22 +3,59 @@
     <el-form :model="person" label-width="80px" style="width: 100%;">
       <el-form-item label="人员">
         <div v-show="assign.length > 0" class="assign-list">
-          <span v-for="(item, index) in assign" :key="index">{{ item.text }} <i :id="'assign-remove_' + index" class="el-icon-close" @click="remove(item)" /></span>
+          <span v-for="(item, index) in assign" :key="index">
+            {{ item.text }} <i :id="'assign-remove_' + index" class="el-icon-close" @click="remove(item)" />
+          </span>
         </div>
-        <el-select id="change-solo" v-model="person.solo" filterable value-key="code" placeholder="请选择人员" @change="changeSolo">
+        <el-select
+          id="change-solo"
+          v-model="person.solo"
+          filterable
+          value-key="code"
+          placeholder="请选择人员"
+          @change="changeSolo"
+        >
           <el-option v-for="(item, index) in route_list" :key="index" :label="item.text" :value="item" />
         </el-select>
-        <el-select id="change-user" v-if="showUser" v-model="user" filterable value-key="code" placeholder="请选择" style="margin-top: 8px;">
+        <el-select
+          id="change-user"
+          v-if="showUser"
+          v-model="user"
+          filterable
+          value-key="code"
+          placeholder="请选择用户"
+          style="margin-top: 8px;"
+          @change="changeUser"
+        >
           <el-option v-for="(item, index) in userList" :key="index" :label="item.text" :value="item" />
         </el-select>
-        <el-select id="change-node" v-if="showNode" v-model="node" :multiple="person.solo.code=='route@node_post@[node_name]@[role_code]' ? false : true" filterable value-key="node_id" placeholder="请选择" style="margin-top: 8px;" @visible-change="changeNode">
+        <el-select
+          id="change-node"
+          v-if="showNode"
+          v-model="node"
+          :multiple="person.solo.code=='route@node_post@[node_name]@[role_code]' ? false : true"
+          filterable value-key="node_id"
+          placeholder="请选择节点"
+          style="margin-top: 8px;"
+          @visible-change="changeNode"
+        >
           <el-option v-for="(item, index) in node_list" :key="index" :label="item.name" :value="item" />
         </el-select>
         <template v-if="showForm">
           <el-input v-model="route_form" placeholder="请填写表单名" style="margin-top: 8px;" />
           <el-input v-model="field" placeholder="请填写字段名" style="margin-top: 8px;" @change="changeField" />
         </template>
-        <el-select id="change-assign-org" v-if="showOrg" v-model="org" filterable value-key="code" placeholder="请选择" style="margin-top: 8px;" @visible-change="changeOrg">
+        <el-select
+          id="change-assign-org"
+          v-if="showOrg"
+          v-model="org"
+          :disabled="orgDisabled"
+          filterable
+          value-key="code"
+          placeholder="请选择机构岗位"
+          style="margin-top: 8px;"
+          @visible-change="changeOrg"
+        >
           <el-option v-for="(item, index) in postList" :key="index" :label="item.text" :value="item" />
         </el-select>
         <div v-if="showServe" style="display: flex; margin-top: 8px;">
@@ -27,22 +64,53 @@
         </div>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="指定用户">
-        <el-select id="change-user-code" v-model="person.user" multiple filterable value-key="code" placeholder="请选择" @change="handleChange('user@', person.user)">
+        <el-select
+          id="change-user-code"
+          v-model="person.user"
+          multiple
+          filterable
+          value-key="code"
+          placeholder="请选择"
+          @change="handleChange('user@', person.user)"
+        >
           <el-option v-for="(item, index) in userList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="小组">
-        <el-select id="change-group" v-model="person.group" multiple filterable value-key="code" placeholder="请选择小组" @change="handleChange('group@', person.group)">
+        <el-select
+          id="change-group"
+          v-model="person.group"
+          multiple filterable
+          value-key="code"
+          placeholder="请选择小组"
+          @change="handleChange('group@', person.group)"
+        >
           <el-option v-for="(item, index) in groupList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="角色">
-        <el-select id="change-role" v-model="person.role" multiple filterable value-key="code" placeholder="请选择角色" @change="handleChange('role@', person.role)">
+        <el-select
+          id="change-role"
+          v-model="person.role"
+          multiple
+          filterable
+          value-key="code"
+          placeholder="请选择角色"
+          @change="handleChange('role@', person.role)"
+        >
           <el-option v-for="(item, index) in roleList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item :style="{'margin-top': isCountersign ? '10px' : '0'}" label="机构">
-        <el-select id="change-org" v-model="person.organ" multiple filterable value-key="code" placeholder="请选择机构" @change="handleChange('organ@', person.organ)">
+        <el-select
+          id="change-org"
+          v-model="person.organ"
+          multiple
+          filterable
+          value-key="code"
+          placeholder="请选择机构"
+          @change="handleChange('organ@', person.organ)"
+        >
           <el-option v-for="(item, index) in orgList" :key="index" :label="item.text" :value="item" />
         </el-select>
       </el-form-item>
@@ -94,7 +162,8 @@ export default {
       showOrg: false,
       route_list: [],
       countersign: {},
-      canvas: null
+      canvas: null,
+      orgDisabled: true
     }
   },
   computed: {
@@ -107,7 +176,8 @@ export default {
       'node_assign',
       'node_list',
       'obj_list',
-      'countersign_info'
+      'countersign_info',
+      'post_list'
     ])
   },
   watch: {
@@ -136,9 +206,6 @@ export default {
     this.fetchData()
   },
   mounted() {
-    this.postList = this.roleList.filter(item => {
-      return item.type === 'post'
-    })
     if (this.isCountersign) {
       this.route_list = this.routeList.filter(item => {
         return item.code !== 'route@all@'
@@ -300,6 +367,10 @@ export default {
         this.showNode = false
         this.showForm = false
       }
+      if (val.code.indexOf('start_post') !== -1 || val.code.indexOf('login_post') !== -1 || val.code.indexOf('node_post') !== -1 || val.code.indexOf('field_post') !== -1) {
+        this.postList = this.post_list
+        this.orgDisabled = false
+      }
 
       if (!this.showUser && !this.showNode && !this.showServe && !this.showForm && !this.showOrg) {
         const solo = this.assign.find(item => {
@@ -321,33 +392,42 @@ export default {
         this.setPerson(this.assign)
       }
     },
+    changeUser(val) {
+      this.orgDisabled = false
+      const openid = val.code.replace('user@', '')
+      this.$Apis.flowCommon.get_user_postlist(openid).then(response => {
+        if (response.code === this.$Utils.Constlib.ERROR_CODE_OK) {
+          this.postList = response.payload
+        }
+      })
+    },
     changeOrg(val) {
       if (!val && this.org) {
         const assign = []
-        const org_code = this.org.code.replace('role@', '')
+        const role_code = this.org.code
         if (this.person.solo.code.indexOf('user_post') !== -1) {
           const user_code = this.user.code.replace('user@', '')
           assign.push({
             text: this.person.solo.text + '-' + this.user.text + '-' + this.org.text,
-            code: 'route@user_post@' + user_code + '@' + org_code
+            code: 'route@user_post@' + user_code + '@' + role_code
           })
         }
         if (this.person.solo.code.indexOf('start_post') !== -1 || this.person.solo.code.indexOf('login_post') !== -1) {
           assign.push({
             text: this.person.solo.text + '-' + this.org.text,
-            code: this.person.solo.code.replace(/\[(.+?)\]/g, org_code)
+            code: this.person.solo.code.replace(/\[(.+?)\]/g, role_code)
           })
         }
         if (this.person.solo.code.indexOf('node_post') !== -1) {
           assign.push({
             text: this.person.solo.text + '-' + this.node.name + '-' + this.org.text,
-            code: 'route@node_post@' + this.node.node_id + '@' + org_code
+            code: 'route@node_post@' + this.node.node_id + '@' + role_code
           })
         }
         if (this.person.solo.code.indexOf('field_post') !== -1) {
           assign.push({
             text: this.person.solo.text + '-' + this.route_form + '.' + this.field + '-' + this.org.text,
-            code: 'route@field_post@' + this.route_form + '.' + this.field + '@' + org_code
+            code: 'route@field_post@' + this.route_form + '.' + this.field + '@' + role_code
           })
         }
 
@@ -363,6 +443,7 @@ export default {
           this.showOrg = false
           this.showNode = false
           this.showForm = false
+          this.orgDisabled = true
         })
       }
     },

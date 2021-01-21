@@ -23,7 +23,7 @@ const flow = {
     titleRule: null,
     moduleInit: {},
     timer_info: {},
-    isSave: false
+    post_list: [] // 机构岗位列表
   },
   mutations: {
     SET_ROUTE_LIST: (state, routeList) => {
@@ -95,8 +95,8 @@ const flow = {
     SET_TIMER_INFO: (state, timer_info) => {
       state.timer_info = timer_info
     },
-    SET_IS_SAVE: (state, isSave) => {
-      state.isSave = isSave
+    SET_POST_LIST: (state, post_list) => {
+      state.post_list = post_list
     }
   },
   actions: {
@@ -164,7 +164,7 @@ const flow = {
     url_module_node: state => state.url_module_node,
     moduleInit: state => state.moduleInit,
     timer_info: state => state.timer_info,
-    isSave: state => state.isSave
+    post_list: state => state.post_list
   },
   preserveState: true
 }

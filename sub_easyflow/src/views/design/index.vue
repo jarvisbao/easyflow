@@ -95,13 +95,13 @@ export default {
       loadingNew: false,
       flowDefaultBtns: [],
       nodeDefaultBtns: [],
-      bpmnNodeId: null
+      bpmnNodeId: null,
+      isSave: false
     }
   },
   computed: {
     ...mapGetters([
-      'flow_info',
-      'isSave'
+      'flow_info'
     ])
   },
   watch: {
@@ -142,6 +142,12 @@ export default {
         this.$store.commit('SET_USER_LIST', response.payload)
       }
     })
+    // 机构岗位列表
+    this.$Apis.flowCommon.get_all_postlist().then(response => {
+      if (response.code === this.$Utils.Constlib.ERROR_CODE_OK) {
+        this.$store.commit('SET_POST_LIST', response.payload)
+      }
+    })
     // 默认按钮
     this.$Apis.flow.buttons_default().then(response => {
       if (response.code === this.$Utils.Constlib.ERROR_CODE_OK) {
@@ -164,7 +170,6 @@ export default {
     })
   },
   mounted() {
-    // this.$store.commit('SET_IS_SAVE', false)
     this.height = this.$refs.canvas.clientHeight
     const canvas = this.$refs.canvas
     const customTranslateModule = {
@@ -205,9 +210,9 @@ export default {
       setTimeout(() => {
         const classList = document.querySelector('.bjsl-button').className.split(' ')
         if (classList.includes('bjsl-button-error')) {
-          this.$store.commit('SET_IS_SAVE', true)
+          this.isSave = true
         } else {
-          this.$store.commit('SET_IS_SAVE', false)
+          this.isSave = false
         }
       }, 500)
     },
