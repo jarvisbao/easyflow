@@ -1,89 +1,91 @@
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      auto-complete="on"
-      label-position="left"
-    >
-      <h3 class="title">
-        ENFO I5 Platform
-      </h3>
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user_center" />
-        </span>
-        <el-input
-          v-model="loginForm.username"
-          name="username"
-          type="text"
-          auto-complete="on"
-          placeholder="用户"
-        />
-      </el-form-item>
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          v-model="loginForm.password"
-          :type="pwdType"
-          name="password"
-          auto-complete="on"
-          placeholder="密码"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="pwdType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item>
-      <el-form-item prop="captcha" class="ver-code">
-        <span class="svg-container">
-          <svg-icon icon-class="verificationcode" />
-        </span>
-        <el-input v-model="loginForm.captcha" type="text" name="captcha" placeholder="验证码" @keyup.enter.native="handleLogin" @input="handleInput" />
-        <img :src="verificationCode" alt="验证码" class="verificationCode" @click="getcaptcha">
-        <div v-if="isCode" class="code-msg">
-          请输入正确的验证码
+    <div>
+      <el-form
+        ref="loginForm"
+        :model="loginForm"
+        :rules="loginRules"
+        class="login-form"
+        auto-complete="on"
+        label-position="left"
+      >
+        <h3 class="title">
+          ENFO I5 Platform
+        </h3>
+        <el-form-item prop="username">
+          <span class="svg-container">
+            <svg-icon icon-class="user_center" />
+          </span>
+          <el-input
+            v-model="loginForm.username"
+            name="username"
+            type="text"
+            auto-complete="on"
+            placeholder="用户"
+          />
+        </el-form-item>
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            v-model="loginForm.password"
+            :type="pwdType"
+            name="password"
+            auto-complete="on"
+            placeholder="密码"
+            @keyup.enter.native="handleLogin"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="pwdType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+        <el-form-item prop="captcha" class="ver-code">
+          <span class="svg-container">
+            <svg-icon icon-class="verificationcode" />
+          </span>
+          <el-input v-model="loginForm.captcha" type="text" name="captcha" placeholder="验证码" @keyup.enter.native="handleLogin" @input="handleInput" />
+          <img :src="verificationCode" alt="验证码" class="verificationCode" @click="getcaptcha">
+          <div v-if="isCode" class="code-msg">
+            请输入正确的验证码
+          </div>
+        </el-form-item>
+        <p v-if="captcha_str" id="captcha" style="display:none">
+          {{ captcha_str }}
+        </p>
+        <el-form-item class="remember">
+          <router-link class="forget-pass" to="/retrieve_password">
+            忘记密码？
+          </router-link>
+        </el-form-item>
+        <el-form-item class="login-button">
+          <el-button
+            id="login"
+            :loading="loading"
+            type="primary"
+            style="width:100%;"
+            @click.native.prevent="handleLogin"
+          >
+            登录
+          </el-button>
+        </el-form-item>
+      </el-form>
+      <div class="other-login">
+        <el-divider>使用第三方帐号登录</el-divider>
+        <div class="list">
+          <span class="icon-box" @click="LarkLogin">
+            <svg-icon icon-class="feishu" />
+            <lark ref="lark" :is-login="true" />
+          </span>
+          <span class="icon-box" @click="DingTalkLogin">
+            <svg-icon icon-class="ding-talk" />
+            <ding-talk ref="dingtalk" :is-login="true" />
+          </span>
+          <span class="icon-box" @click="WeChatLogin">
+            <svg-icon icon-class="wechat" />
+            <we-chat ref="wechat" :is-login="true" />
+          </span>
         </div>
-      </el-form-item>
-      <p v-if="captcha_str" id="captcha" style="display:none">
-        {{ captcha_str }}
-      </p>
-      <el-form-item class="remember">
-        <router-link class="forget-pass" to="/retrieve_password">
-          忘记密码？
-        </router-link>
-      </el-form-item>
-      <el-form-item class="login-button">
-        <el-button
-          id="login"
-          :loading="loading"
-          type="primary"
-          style="width:100%;"
-          @click.native.prevent="handleLogin"
-        >
-          登录
-        </el-button>
-      </el-form-item>
-    </el-form>
-    <div class="other-login">
-      <el-divider>使用第三方帐号登录</el-divider>
-      <div class="list">
-        <span class="icon-box" @click="LarkLogin">
-          <svg-icon icon-class="feishu" />
-          <lark ref="lark" :is-login="true" />
-        </span>
-        <span class="icon-box" @click="DingTalkLogin">
-          <svg-icon icon-class="ding-talk" />
-          <ding-talk ref="dingtalk" :is-login="true" />
-        </span>
-        <span class="icon-box" @click="WeChatLogin">
-          <svg-icon icon-class="wechat" />
-          <we-chat ref="wechat" :is-login="true" />
-        </span>
       </div>
     </div>
   </div>
