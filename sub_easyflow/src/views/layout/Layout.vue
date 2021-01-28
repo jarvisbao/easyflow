@@ -115,7 +115,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-@import url('//at.alicdn.com/t/font_1321656_3l4po36nn9s.css');
+// @import url('//at.alicdn.com/t/font_1321656_3l4po36nn9s.css');
 .app-wrapper {
   position: relative;
   height: 100%;

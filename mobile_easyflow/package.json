@@ -9,7 +9,8 @@
     "lint:fix": "eslint --fix --ext .js,.vue ./;exit 0"
   },
   "dependencies": {
-    "@hzenfo/vant": "^0.2.2",
+    "@hzenfo/vant": "^0.2.4",
+    "@hzenfo/vue-form-making": "^0.1.6",
     "async-validator": "^3.4.0",
     "axios": "^0.19.2",
     "bpmn-js": "^6.5.1",

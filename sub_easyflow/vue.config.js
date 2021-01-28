@@ -65,7 +65,8 @@ module.exports = {
       extensions: ['.js', '.vue', '.json'],
       alias: {
         '@': resolve('src'),
-        'vue$': 'vue/dist/vue.esm.js'
+        'vue$': 'vue/dist/vue.esm.js',
+        'vue-form-making': '@hzenfo/vue-form-making'
       }
     }
     Object.assign(config.resolve, resolves)

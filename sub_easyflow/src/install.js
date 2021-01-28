@@ -45,3 +45,7 @@ import 'v-charts/lib/style.css'
 [VeChart, VeLine, VeHistogram, VePie].forEach(comp => {
   Vue.component(comp.name, comp)
 })
+
+import FormMaking from 'vue-form-making'
+import 'vue-form-making/dist/FormMaking.css'
+Vue.use(FormMaking)

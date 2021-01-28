@@ -32,3 +32,7 @@ Vue.filter('formatData', function(value) {
     return value
   }
 })
+
+import FormMaking from 'vue-form-making'
+import 'vue-form-making/dist/FormMaking.css'
+Vue.use(FormMaking)
