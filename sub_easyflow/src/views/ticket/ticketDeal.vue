@@ -33,13 +33,13 @@
         <div v-if="tasksInfo.length > 0" class="tips-msg">
           <div>
             <i class="iconfont icon-dangdi" />
-            <span v-for="(item, index) in beforeNode" :key="index">{{ item }}</span>
-            <el-dropdown v-if="nodeItems.length > 0" style="margin-right: 0">
+            <span v-for="(item, index) in nodeItems.slice(0, 3)" :key="index">{{ item }}</span>
+            <el-dropdown v-if="nodeItems.length > 3" style="margin-right: 0">
               <span style="cursor: pointer;">
                 <i class="el-icon-arrow-down el-icon--right" />
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-for="(item, index) in nodeItems" :key="index">
+                <el-dropdown-item v-for="(item, index) in nodeItems.slice(3)" :key="index">
                   {{ item }}
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -47,13 +47,13 @@
           </div>
           <div>
             <i class="iconfont icon-geren" />
-            <span v-for="(item, index) in beforeOwners" :key="index">{{ item }}</span>
-            <el-dropdown v-if="nodeOwners.length > 0" style="margin-right: 0">
+            <span v-for="(item, index) in nodeOwners.slice(0, 4)" :key="index">{{ item }}</span>
+            <el-dropdown v-if="nodeOwners.length > 4" style="margin-right: 0">
               <span style="cursor: pointer;">
                 <i class="el-icon-arrow-down el-icon--right" />
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-for="(item, index) in nodeOwners" :key="index">
+                <el-dropdown-item v-for="(item, index) in nodeOwners.slice(4)" :key="index">
                   {{ item }}
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -264,14 +264,6 @@ export default {
     }
   },
   computed: {
-    beforeNode() {
-      const { nodeItems } = this
-      return nodeItems.splice(0, 4)
-    },
-    beforeOwners() {
-      const { nodeOwners } = this
-      return nodeOwners.splice(0, 4)
-    },
     activeName: {
       get() {
         if (this.button_obj.length > 0) {
