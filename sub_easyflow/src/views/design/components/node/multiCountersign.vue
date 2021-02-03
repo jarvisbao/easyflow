@@ -1,7 +1,7 @@
 <template>
   <div class="multi-countersign">
-    <el-form :model="countersign" label-width="120px">
-      <el-form-item label="是否多实例会签">
+    <el-form :model="countersign" label-width="105px">
+      <el-form-item label="多实例会签">
         <el-switch v-model="countersign.open" @change="handleChange" />
       </el-form-item>
       <template v-if="countersign.open">
@@ -518,25 +518,29 @@ export default {
     color: #409eff;
   }
 }
-.list li {
-  display: flex;
-  align-items: center;
-  .input-group {
-    width: 90% !important;
-  }
-  .delete {
-    margin-left: 12px;
-    font-size: 18px;
-    color: #969696;
-    cursor: pointer;
-    &:hover {
-      color: #409eff;
+.list {
+  margin-left: -45px;
+  li {
+    display: flex;
+    align-items: center;
+    .input-group {
+      width: 90% !important;
+    }
+    .delete {
+      margin-left: 8px;
+      font-size: 18px;
+      color: #969696;
+      cursor: pointer;
+      &:hover {
+        color: #409eff;
+      }
+    }
+    & + li {
+      margin-top: 8px;
     }
   }
-  & + li {
-    margin-top: 8px;
-  }
 }
+
 .assign-list {
   // border: 1px solid #DCDFE6;
   // border-radius: 4px;
@@ -570,5 +574,8 @@ export default {
       }
     }
   }
+}
+/deep/ .el-input-group__prepend {
+  padding: 0 8px;
 }
 </style>

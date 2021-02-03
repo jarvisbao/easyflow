@@ -69,40 +69,40 @@ const lifeCycle = () => {
     async mount(props) {
       store.commit('SET_VUE_APP_NAME', process.env.VUE_APP_NAME)
       // 注册应用间通信
-      props.onGlobalStateChange((state, prev) => {
-        // state: 变更后的状态; prev 变更前的状态
-        // 表单设计器 注册组件
-        if (state.rsgComponent) {
-          Vue.component(state.rsgComponent.name, {
-            props: state.rsgComponent.props,
-            template: state.rsgComponent.component
-          })
-        }
-        // 表单生成器 注册组件
-        if (state.showComponent) {
-          Vue.component(state.showComponent.name, {
-            props: state.showComponent.props,
-            data: () => ({
-              dataModel: state.showComponent.value
-            }),
-            watch: {
-              dataModel(val) {
-                if (this.ui === 'antd') {
-                  Vue.prototype.$Utils.EventBus.$emit('on-field-change', this.$attrs.id, val)
-                } else {
-                  this.$emit('input', val)
-                }
-              },
-              value(val) {
-                this.dataModel = val
-              }
-            },
-            template: state.showComponent.component
-          })
-        }
-      })
-      props.setGlobalState(state => {
-      })
+      // props.onGlobalStateChange((state, prev) => {
+      //   // state: 变更后的状态; prev 变更前的状态
+      //   // 表单设计器 注册组件
+      //   if (state.rsgComponent) {
+      //     Vue.component(state.rsgComponent.name, {
+      //       props: state.rsgComponent.props,
+      //       template: state.rsgComponent.component
+      //     })
+      //   }
+      //   // 表单生成器 注册组件
+      //   if (state.showComponent) {
+      //     Vue.component(state.showComponent.name, {
+      //       props: state.showComponent.props,
+      //       data: () => ({
+      //         dataModel: state.showComponent.value
+      //       }),
+      //       watch: {
+      //         dataModel(val) {
+      //           if (this.ui === 'antd') {
+      //             Vue.prototype.$Utils.EventBus.$emit('on-field-change', this.$attrs.id, val)
+      //           } else {
+      //             this.$emit('input', val)
+      //           }
+      //         },
+      //         value(val) {
+      //           this.dataModel = val
+      //         }
+      //       },
+      //       template: state.showComponent.component
+      //     })
+      //   }
+      // })
+      // props.setGlobalState(state => {
+      // })
       // 注册微应用实例化函数
       render(props)
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="config-node">
-    <el-form ref="form" :model="form" label-width="100px" style="width: 100%;">
+    <el-form ref="form" :model="form" label-width="85px" style="width: 100%;">
       <el-collapse v-model="activeNames">
         <el-collapse-item name="baseinfo">
           <template slot="title">
